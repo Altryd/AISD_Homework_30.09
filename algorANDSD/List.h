@@ -29,7 +29,7 @@ public:
 	}
 	void Print() const
 	{
-		printf(" %lf - %s\n ", value, key);
+		printf("%lf - %s\n", value, key);
 	}
 	friend class List;
 	friend struct Node;

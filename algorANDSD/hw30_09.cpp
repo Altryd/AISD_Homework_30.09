@@ -15,4 +15,6 @@ int main()
 	c.Print();
 	c += Pair({ 0.5,"kukusik" });
 	c.Print();
+	c[(size_t)0].Print();
+	c["kukusik"].Print();
 }
