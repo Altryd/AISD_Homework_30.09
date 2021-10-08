@@ -1,59 +1,56 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include <string>
+#include <typeinfo>
 #include <iostream>
-
+template <typename TKey, typename TVal>
 struct Pair
 {
 private:
-	double value;
-	char* key;
+	TKey key;
+	TVal value;
 public:
-	Pair(const double value = 0, const char* key = nullptr)
+	Pair(const TKey key = 0, const TVal value = 0)
 	{
+		this->key = key;
 		this->value = value;
-		this->key = _strdup(key);
 	}
-	~Pair()
-	{
-		if (key != nullptr)
-		{
-			free(key);
-			key = nullptr;
-		}
-		//printf(" PAIR DTOR\n");
-	}
+	~Pair() = default;
 	Pair(const Pair& rhs)
 	{
 		this->value = rhs.value;
-		this->key = _strdup(rhs.key);
+		this->key = rhs.key;
 	}
 	void Print() const
 	{
-		printf("%lf - %s\n", value, key);
+		std::cout << "key: "<<key << " value - " << value;
 	}
-	friend class List;
-	friend struct Node;
+	template <typename TKey, typename TVal> friend class List;
+	template <typename TKey, typename TVal> friend struct Node;
 };
+
+template <typename TKey, typename TVal>
 struct Node
 {
 private:
-	Pair pair;
-	Node* next; //Следующий элемент
-	friend class List;
-	Node(const Pair& pair = { 0, nullptr }, Node* next = nullptr)
+	Pair<TKey, TVal> pair;
+	Node* next;//Следующий элемент
+public:
+	template <typename TKey, typename TVal> friend class List;
+	Node(const Pair<TKey, TVal>& pair, Node* next)
 	{
+		this->pair.key = pair.key;
 		this->pair.value = pair.value;
-		this->pair.key = _strdup(pair.key);
 		this->next = next;
 	}
-	Node(const Node& node)
+	Node(const TKey key, const TVal value, Node* next)
 	{
-		this->pair.value = node.pair.value;
-		this->pair.key = _strdup(node.pair.key);
-		this->next = node.next;
+		this->pair.key = key;
+		this->pair.value = value;
+		this->next = next;
 	}
-	Node& operator=(const Node& node)
-	{
+	Node(const Node& node) = delete;
+	Node& operator=(const Node& node) = delete;
+	/*{
 		if (this == &(node)) return *this;
 		if (strcmp(this->pair.key, node.pair.key))
 		{
@@ -75,12 +72,19 @@ private:
 		{
 			throw std::exception("What should I do?");
 		}
+	}*/
+	void Print() const
+	{
+		std::cout << "[";
+		pair.Print();
+		std::cout << "]";
 	}
 };
+template <typename TKey, typename TVal>
 class List
 {
 private:
-	Node* head;
+	Node<TKey, TVal>* head;
 	size_t size;
 public:
 
@@ -93,11 +97,11 @@ public:
 	{
 		Clear();
 	}
-	List(const List& list) //OK
+	List(const List<TKey, TVal>& list) //OK
 	{
 		head = nullptr;
 		size = 0;
-		Node* moving_head = list.head;
+		Node<TKey, TVal>* moving_head = list.head;
 		if (moving_head == nullptr) head = nullptr;
 		while (moving_head != nullptr)
 		{
@@ -121,10 +125,10 @@ public:
 	}
 	void Print() const //OK
 	{
-		Node* next = head;
+		Node<TKey, TVal>* next = head;
 		for (size_t i = 0; i < size; i++)
 		{
-			printf("[%s %lf] -> ", next->pair.key, next->pair.value);
+			std::cout << "[" << next->pair.key << " " << next->pair.value << "] -> ";
 			next = next->next;
 		}
 		printf("NULL\n");
@@ -142,22 +146,22 @@ public:
 		return size;
 	}
 
-	void PushFront(const double value, const char* string)
+	void PushFront(const TKey key, const TVal value)
 	{
-		head = new Node({ value,string }, head);
+		head = new Node<TKey, TVal>({ key, value }, head);
 		size++;
 	}
-	void PushBack(const double value, const char* string)
+	void PushBack(const TKey key, const TVal value)
 	{
-		if (head == nullptr) head = new Node({ value,string }, nullptr);
+		if (head == nullptr) head = new Node<TKey, TVal>({ key, value }, nullptr);
 		else
 		{
-			Node* next = head;
+			Node<TKey, TVal>* next = head;
 			while (next->next != nullptr)
 			{
 				next = next->next;
 			}
-			next->next = new Node({ value,string }, nullptr);
+			next->next = new Node<TKey, TVal>({ key, value }, nullptr);
 		}
 		size++;
 	}
@@ -170,7 +174,7 @@ public:
 		{
 			return;
 		}
-		Node* temp = head;
+		Node<TKey, TVal>* temp = head;
 		while (temp->next != nullptr)
 		{
 			temp = temp->next;
@@ -181,12 +185,13 @@ public:
 	}
 	void PopFront()
 	{
-		Node* temp = head;
+		if (!size) return;
+		Node<TKey, TVal>* temp = head;
 		head = head->next;
 		delete temp;
 		size--;
 	}
-	List& operator=(const List& list)
+	List<TKey, TVal>& operator=(const List<TKey, TVal>& list)
 	{
 		if (this == &(list)) return *this;
 		this->Clear();
@@ -196,10 +201,10 @@ public:
 		}
 		return *this;
 	}
-	Pair& operator[](const size_t index)
+	Pair<TKey, TVal>& operator[](const size_t index)
 	{
 		size_t count = 0;
-		Node* counting_head = head;
+		Node<TKey, TVal>* counting_head = head;
 		if (index >= size) throw std::exception("Bad index");
 		while (count != index)
 		{
@@ -208,10 +213,10 @@ public:
 		}
 		return counting_head->pair;
 	}
-	Pair operator[](const size_t index) const
+	Pair<TKey, TVal> operator[](const size_t index) const
 	{
 		size_t count = 0;
-		Node* counting_head = head;
+		Node<TKey, TVal>* counting_head = head;
 		if (index >= size) throw std::exception("Bad index");
 		while (count != index)
 		{
@@ -220,12 +225,12 @@ public:
 		}
 		return counting_head->pair;
 	}
-	Pair operator[](const char* key) const
+	Pair<TKey, TVal> operator[](const TKey key) const
 	{
-		Node* seeking_head = head;
+		Node<TKey, TVal>* seeking_head = head;
 		while (seeking_head)
 		{
-			if (!strcmp(seeking_head->pair.key, key)) return seeking_head->pair;
+			if (seeking_head->pair.key == key) return seeking_head->pair;
 			else
 			{
 				seeking_head = seeking_head->next;
@@ -233,12 +238,12 @@ public:
 		}
 		throw std::exception("An element with the string does not exist");
 	}
-	Pair& operator[](const char* key)
+	Pair<TKey, TVal>& operator[](const TKey key)
 	{
-		Node* seeking_head = head;
+		Node<TKey, TVal>* seeking_head = head;
 		while (seeking_head)
 		{
-			if (!strcmp(seeking_head->pair.key, key)) return seeking_head->pair;
+			if (seeking_head->pair.key == key) return seeking_head->pair;
 			else
 			{
 				seeking_head = seeking_head->next;
@@ -246,12 +251,12 @@ public:
 		}
 		throw std::exception("An element with the string does not exist");
 	}
-	List& operator+=(const Pair& pair)
+	List<TKey, TVal>& operator+=(const Pair<TKey, TVal>& pair)
 	{
 		this->PushBack(pair.value, pair.key);
 		return *this;
 	}
-	List& operator+=(const List& rhs)
+	List<TKey, TVal>& operator+=(const List<TKey, TVal>& rhs)
 	{
 		size_t new_size = rhs.Size();
 		for (size_t i = 0; i < new_size; i++)
@@ -260,7 +265,7 @@ public:
 		}
 		return *this;
 	}
-	List operator+(const List& rhs) const
+	List<TKey, TVal> operator+(const List<TKey, TVal>& rhs) const
 	{
 		List a(*this);
 		a += rhs;
