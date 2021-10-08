@@ -15,7 +15,7 @@ public:
 		this->value = value;
 	}
 	~Pair() = default;
-	Pair(const Pair& rhs)
+	Pair(const Pair<TKey,TVal>& rhs)
 	{
 		this->value = rhs.value;
 		this->key = rhs.key;
@@ -24,8 +24,118 @@ public:
 	{
 		std::cout << "key: "<<key << " value - " << value;
 	}
+	Pair<TKey, TVal>& operator=(const Pair<TKey, TVal>& rhs) = default;
 	template <typename TKey, typename TVal> friend class List;
 	template <typename TKey, typename TVal> friend struct Node;
+};
+
+
+template<typename TVal>
+struct Pair<char*, TVal>
+{
+private:
+	char* key;
+	TVal value;
+public:
+	Pair(const char* key = nullptr, const TVal value = 0)
+	{
+		this->key = _strdup(key);
+		this->value = value;
+	}
+	~Pair()
+	{
+		if (key != nullptr) free(key);
+		key = nullptr;
+	}
+	Pair(const Pair<char*, TVal>& rhs)
+	{
+		this->key = _strdup(rhs.key);
+		this->value = rhs.value;
+	}
+	void Print() const
+	{
+		std::cout << "key: " << key << " value - " << value;
+	}
+	template <typename TKey, typename TVal> friend class List;
+	template <typename TKey, typename TVal> friend struct Node;
+	Pair<char*, TVal>& operator=(const Pair<char*, TVal>& rhs)
+	{
+		if (this == &(rhs)) return *this;
+		if (rhs.key == nullptr)
+		{
+			if (key != nullptr) free(key);
+			key = nullptr;
+		}
+		else if (key!=nullptr && strcmp(key,rhs.key) != 0)
+		{
+			char* temp_key = _strdup(rhs.key);
+			if (key != nullptr) free(key);
+			key = temp_key;
+		}
+		else if (key == nullptr)
+		{
+			key = _strdup(rhs.key);
+		}
+		if (value != rhs.value)
+		{
+			value = rhs.value;
+		}
+		return *this;
+	}
+};
+
+template<typename TKey>
+struct Pair<TKey, char*>
+{
+private:
+	TKey key;
+	char* value;
+public:
+	Pair(const TKey key = 0, const char* value = nullptr)
+	{
+		this->key = key;
+		this->value = _strdup(value);
+	}
+	~Pair()
+	{
+		if (value != nullptr) free(value);
+		value = nullptr;
+	}
+	Pair(const Pair<TKey, char*>& rhs)
+	{
+		this->key = rhs.key;
+		this->value = _strdup(rhs.value);
+	}
+	void Print() const
+	{
+		std::cout << "key: " << key << " value - " << value;
+	}
+	template <typename TKey, typename TVal> friend class List;
+	template <typename TKey, typename TVal> friend struct Node;
+	Pair<TKey, char*>& operator=(const Pair<TKey, char*>& rhs)
+	{
+		if (this == &(rhs)) return *this;
+		if (rhs.value == nullptr)
+		{
+			if (value != nullptr) free(value);
+			value = nullptr;
+		}
+		else if (value != nullptr && strcmp(value, rhs.value) != 0)
+		{
+			char* temp_value = _strdup(rhs.value);
+			if (value != nullptr) free(value);
+			value = temp_value;
+		}
+		else if (value == nullptr)
+		{
+			value = _strdup(rhs.value);
+		}
+		if (key != rhs.key)
+		{
+			key = rhs.key;
+		}
+		return *this;
+	}
 };
 
 template <typename TKey, typename TVal>
@@ -36,18 +146,37 @@ private:
 	Node* next;//Следующий элемент
 public:
 	template <typename TKey, typename TVal> friend class List;
+	
 	Node(const Pair<TKey, TVal>& pair, Node* next)
 	{
-		this->pair.key = pair.key;
-		this->pair.value = pair.value;
+		this->pair = pair;
 		this->next = next;
 	}
+	
+	template <typename TKey, typename TVal>
 	Node(const TKey key, const TVal value, Node* next)
 	{
 		this->pair.key = key;
 		this->pair.value = value;
 		this->next = next;
 	}
+	
+	template<char*, typename TVal>
+	Node(const char* key, const TVal value, Node<char*, TVal>* next)
+	{
+		this->pair.key = _strdup(key);
+		this->pair.value = value;
+		this->next = next;
+	}
+	
+	template<typename TKey, char*>
+	Node(const TKey key, const char* value, Node<char*, TVal>* next)
+	{
+		this->pair.key =key;
+		this->pair.value = _strdup(value);
+		this->next = next;
+	}
+	
 	Node(const Node& node) = delete;
 	Node& operator=(const Node& node) = delete;
 	/*{
@@ -80,6 +209,14 @@ public:
 		std::cout << "]";
 	}
 };
+//class A
+//{
+//	template <typename T>
+//	A(T t) {}
+//
+//	template <int N>
+//	A(static_str<N> str) {}
+//};
 template <typename TKey, typename TVal>
 class List
 {
@@ -161,6 +298,34 @@ public:
 				next = next->next;
 			}
 			next->next = new Node<TKey, TVal>({ key, value }, nullptr);
+		}
+		size++;
+	}
+	void PushBack(const char* key, const TVal value)
+	{
+		if (!size) head = new Node<char*, TVal>({ key, value }, nullptr);
+		else
+		{
+			Node<TKey, TVal>* next = head;
+			while (next->next != nullptr)
+			{
+				next = next->next;
+			}
+			next->next = new Node<char*, TVal>({ key, value }, nullptr);
+		}
+		size++;
+	}
+	void PushBack(const TKey key, const char* value)
+	{
+		if (!size) head = new Node<TKey, char*>({ key, value }, nullptr);
+		else
+		{
+			Node<TKey, TVal>* next = head;
+			while (next->next != nullptr)
+			{
+				next = next->next;
+			}
+			next->next = new Node<TKey, char*>({ key, value }, nullptr);
 		}
 		size++;
 	}
