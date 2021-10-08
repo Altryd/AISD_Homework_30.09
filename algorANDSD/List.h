@@ -105,7 +105,7 @@ public:
 		if (moving_head == nullptr) head = nullptr;
 		while (moving_head != nullptr)
 		{
-			this->PushBack(moving_head->pair.value, moving_head->pair.key);
+			this->PushBack(moving_head->pair.key, moving_head->pair.value);
 			/*Node* new_elem = new Node();
 			new_elem->pair.value = moving_head->pair.value;
 			new_elem->pair.key = _strdup(moving_head->pair.key);
@@ -145,7 +145,6 @@ public:
 	{
 		return size;
 	}
-
 	void PushFront(const TKey key, const TVal value)
 	{
 		head = new Node<TKey, TVal>({ key, value }, head);
@@ -153,7 +152,7 @@ public:
 	}
 	void PushBack(const TKey key, const TVal value)
 	{
-		if (head == nullptr) head = new Node<TKey, TVal>({ key, value }, nullptr);
+		if (!size) head = new Node<TKey, TVal>({ key, value }, nullptr);
 		else
 		{
 			Node<TKey, TVal>* next = head;
@@ -165,9 +164,6 @@ public:
 		}
 		size++;
 	}
-
-
-
 	void PopBack()
 	{
 		if (!size)
@@ -197,7 +193,7 @@ public:
 		this->Clear();
 		for (size_t i = 0; i < list.Size(); i++)
 		{
-			this->PushBack(list[i].value, list[i].key);
+			this->PushBack(list[i].key, list[i].value);
 		}
 		return *this;
 	}
@@ -253,7 +249,7 @@ public:
 	}
 	List<TKey, TVal>& operator+=(const Pair<TKey, TVal>& pair)
 	{
-		this->PushBack(pair.value, pair.key);
+		this->PushBack(pair.key, pair.value);
 		return *this;
 	}
 	List<TKey, TVal>& operator+=(const List<TKey, TVal>& rhs)
@@ -261,7 +257,7 @@ public:
 		size_t new_size = rhs.Size();
 		for (size_t i = 0; i < new_size; i++)
 		{
-			PushBack(rhs[i].value, rhs[i].key);
+			PushBack(rhs[i].key, rhs[i].value);
 		}
 		return *this;
 	}

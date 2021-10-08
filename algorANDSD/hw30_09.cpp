@@ -7,42 +7,36 @@
 
 int main()
 {
-	//Pair<int, double> para(5,1.5);
-	//Pair<int, int> para2(5, 111);
-	//para.Print();
-	//std::cout << std::endl;
-	//para2.Print();
-	//std::cout << std::endl;
-	//Node<int, double> noda(para, NULL);
-	//noda.Print();
-	//std::cout << std::endl;
-	//Node<double, double> noda2({2,3}, NULL);
-	//noda2.Print();
-	//std::cout << std::endl;
-	//
-	//List<int, double> a;
-	//a.PushBack(100, 101.33);
-	//a.PushBack(500, 502.21);
-	//a.PushFront(4107, 9.9);
-	//a.Print();
-
-	//List<double, double> b;
-	//b.PushBack(100.2, 101.33);
-	//b.PushBack(500.55, 502.21);
-	//b.PushFront(4107.99, 9.9);
-	//b.Print();
-
-	List<std::complex<int>, double> complex;
-	complex.PushBack({ 100, 5 }, 101.33);
-	complex.PushBack({ 500, 3 }, 502.21);
-	complex.PushFront({55, 4107}, 9.9);
-	complex.Print();
-	complex.PopBack();
-	complex.Print();
-	complex.PopFront();
-	complex.Print();
-	complex.PopFront();
-	complex.Print();
-	complex.PopFront();
-	complex.Print();
+	List<double, int> list;
+	list.PushBack(5.5, 3);
+	list.PushFront(11.1, 55);
+	list.Print();
+	List<double, int> list_copy(list);
+	list.Clear();
+	list.PopBack();
+	list.PopFront();
+	list_copy.Print();
+	list_copy.PopBack();
+	list_copy.PopFront();
+	list_copy.Print();
+	list.PushBack(5.5, 3);
+	list.PushFront(11.1, 55);
+	list.PushBack(3.3, 88);
+	list.PushFront(99.9, 99);
+	list.Print();
+	List<double, int> list_assigment;
+	list_assigment = list;
+	list.Clear();
+	list.Print();
+	list_assigment.Print();
+	Pair<double,int> para_assig = list_assigment[3.3];
+	para_assig.Print();
+	std::cout << std::endl;
+	list += para_assig;
+	list.Print();
+	list_assigment += list;
+	list_assigment.Print();
+	List<double, int> sum;
+	sum = list_assigment + list_assigment + list;
+	sum.Print();
 }
