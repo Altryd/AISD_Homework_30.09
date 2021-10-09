@@ -3,35 +3,38 @@
 #include <iostream>
 #include <typeinfo>
 #include <complex>
+#include <list>
 #include "List.h"
 
 int main()
 {
 	//Pair<char*, int> para("Ky", 5);
-	//para.Print();
+	//std::cout << para;
 	//Pair<char*, int>copy(para);
-	//copy.Print();
+	//std::cout <<  copy;
 	//Pair<char*, int> parochka("privet", 110);
 	//para = parochka;
 	//std::cout << "\n para:";
-	//para.Print();
+	//std::cout <<  para;
 	//std::cout << "\n parochka:";
-	//parochka.Print();
+	//std::cout <<  parochka;
 	//parochka = para = copy;
 	//std::cout << "\n\n\n";
-	//copy.Print();
+	//std::cout <<  copy;
 	//std::cout << "\n";
-	//para.Print();
+	//std::cout <<  para;
 	//std::cout << "\n";
-	//parochka.Print();
-	//Node<int, double> a({ 4,3.3 }, nullptr);
-	//a.Print();
-	//Node<char*, double> string({ "kykyk", 5.5 }, nullptr);
-	//string.Print();
-	//Node<double, char*> string2({ 33.3, "privet" }, nullptr);
-	//string2.Print();
-	//List<char*, double> a;
-	//a.PushBack("kdfdy", 5.5);
+	//std::cout <<  parochka;
+	//NodeTest<Pair<int, double>> a({ 4,3.3 }, nullptr);
+	//std::cout <<  a;
+	//NodeTest<Pair<char*, double>> string({ "kykyk", 5.5 }, nullptr);
+	//std::cout <<  string;
+	//NodeTest<Pair<double, char*>> string2({ 33.3, "privet" }, nullptr);
+	//std::cout << string2;
+	//List< Pair<char*, double> > a2;
+	//a2.PushBack({ "kdfdy", 5.5 });
+	//std::cout << std::endl;
+	//a2.Print();
 	//a.Print();
 	//Pair<char*, double> para("privet", 22.3);
 	//a += para;
@@ -39,24 +42,27 @@ int main()
 	//a = a + a + a;
 	//a.Print();
 
-	//List<double, char*> b;
-	//b.PushBack(33.4, "yy");
-	//b.PushFront(33.3, "kkyk");
-	//b.Print();
-	//b = b + b + b + b + b;
-	//b.Print();
-	//b[(size_t)0] = { 22.8, "zamena" };
-	//b.Print();
+	List<Pair<double, char*>> b;
+	b.PushBack({ 33.4, "yy" });
+	b.PushFront({ 33.3, "kkyk" });
+	b.Print();
+	b = b + b + b + b + b;
+	b.Print();
+	b[(size_t)0] = { 22.8, "zamena" };
+	b.Print();
 
 
-	List<char*, char*> test;
-	test.PushBack("ky", "privet");
-	test.PushFront("zdarova", "chelik");
+	List<Pair<char*,char*>> test;
+	test.PushBack({ "ky", "privet" });
+	test.PushFront({ "zdarova", "chelik" });
 	test.Print();
 	test = test + test + test + test;
 	test.Print();
 	test[(size_t)0] = { "eto", "zamena" };
 	test.Print();
+	std::list<int> a;
+	
+
 	//List<double, int> list;
 	//list.PushBack(5.5, 3);
 	//list.PushFront(11.1, 55);
