@@ -30,20 +30,33 @@ int main()
 	//string.Print();
 	//Node<double, char*> string2({ 33.3, "privet" }, nullptr);
 	//string2.Print();
-	List<char*, double> a;
-	a.PushBack("kdfdy", 5.5);
-	a.Print();
-	Pair<char*, double> para("privet", 22.3);
-	a += para;
-	a.Print();
-	a = a + a + a;
-	a.Print();
+	//List<char*, double> a;
+	//a.PushBack("kdfdy", 5.5);
+	//a.Print();
+	//Pair<char*, double> para("privet", 22.3);
+	//a += para;
+	//a.Print();
+	//a = a + a + a;
+	//a.Print();
 
-	List<double, char*> b;
-	b.PushBack(33.4, "yy");
-	b.Print();
-	b = b + b + b + b + b;
-	b.Print();
+	//List<double, char*> b;
+	//b.PushBack(33.4, "yy");
+	//b.PushFront(33.3, "kkyk");
+	//b.Print();
+	//b = b + b + b + b + b;
+	//b.Print();
+	//b[(size_t)0] = { 22.8, "zamena" };
+	//b.Print();
+
+
+	List<char*, char*> test;
+	test.PushBack("ky", "privet");
+	test.PushFront("zdarova", "chelik");
+	test.Print();
+	test = test + test + test + test;
+	test.Print();
+	test[(size_t)0] = { "eto", "zamena" };
+	test.Print();
 	//List<double, int> list;
 	//list.PushBack(5.5, 3);
 	//list.PushFront(11.1, 55);
