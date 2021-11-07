@@ -1,156 +1,270 @@
 #include <iostream>
-int Mass[8][2];
-bool ChessBoard[8][8];
+#include <vector>
+#include <cstdlib>
+#include <list>
+template <typename T>
+class Iterator;
 
-void FillMass()
+template <typename T>
+class List
 {
-	for (int i = 0; i < 8; i++)
+	template <typename T>
+	struct Node
 	{
-		Mass[i][0] = -1;
-		Mass[i][1] = -1;
+		Node* next;
+		Node* prev;
+		T data;
+	};
+	Node<T> head;
+public:
+	List()
+	{
+		head.next = &head;
+		head.prev = &head;
 	}
-}
-
-void FillChessBoard()
-{
-	for (int i = 0; i < 8; i++)
+	List(const List<T>& rhs)
 	{
-		for (int j = 0; j < 8; j++)
+		head.next = &head;
+		head.prev = &head;
+		Node<T> temp = rhs.head;
+		while (temp.next != &(rhs.head))
 		{
-			ChessBoard[i][j] = true;
+			PushBack(temp.next->data);
+			temp.next = temp.next->next;
 		}
 	}
-}
-
-void PrintFigures()
-{
-	std::cout << "Figure array:";
-	for (int i = 0; i < 8; i++)
+	~List()
 	{
-		std::cout << Mass[i][0] << " , " << Mass[i][1] << std::endl;
-	}
-	std::cout << std::endl;
-}
-
-void PrintChessBoard()
-{
-	for (int i = 0; i < 8; i++)
-	{
-		for (int j = 0; j < 8; j++)
+		while (head.next != &head)
 		{
-			if (ChessBoard[i][j]) std::cout << "   1   ";
-			else std::cout << "   0   ";
+			Node<T>* temp = head.next;
+			head.next = head.next->next;
+			delete temp;
 		}
-		std::cout << std::endl;
+		head.prev = &head;
 	}
-}
-
-bool IsAttackedByRook(const int validate_position_x, const int validate_position_y,
-	const int rook_position_x, const int rook_position_y)
-{
-	return (validate_position_x == rook_position_x || validate_position_y == rook_position_y);
-}
-bool IsAttackedByQueen(const int validate_position_x, const int validate_position_y,
-	const int queen_position_x, const int queen_position_y)
-{
-	const int dx = validate_position_x - queen_position_x;
-	const int dy = validate_position_y - queen_position_y;
-	return (dx == 0 || dy == 0 || dx == dy);
-}
-
-void FillBoardWithRooks(int count, int first_x, int first_y)
-{
-	Mass[0][0] = first_x;
-	Mass[0][1] = first_y;
-	for (int i = 0; i < 8; i++)
+	void PopFront()
 	{
-		for (int j = 0; j < 8; j++)
+		if (head.next == &head) throw "List is empty";
+		Node<T>* temp = head.next;
+		temp->next->prev = temp->prev;
+		temp->prev->next = temp->next;
+		delete temp;
+	}
+	void PushFront(const T& new_data)
+	{
+		Node<T>* new_elem = new Node<T>();
+		new_elem->data = new_data;
+		new_elem->next = head.next;
+		new_elem->prev = &head;
+		new_elem->next->prev = new_elem;
+		new_elem->prev->next = new_elem;
+	}
+	void PushBack(const T& new_data)
+	{
+		Node<T>* new_elem = new Node<T>();
+		new_elem->data = new_data;
+		new_elem->next = &head;
+		new_elem->prev = head.prev;
+		new_elem->next->prev = new_elem;
+		new_elem->prev->next = new_elem;
+	}
+	friend class Iterator<T>;
+
+	Iterator<T> Begin()
+	{
+		return Iterator<T>(this, head.next);
+	}
+	Iterator<T> End()
+	{
+		return Iterator<T>(this, &head);
+	}
+};
+
+template <typename T>
+class Iterator
+{
+private:
+	List<T>* container;
+	List<T>::Node<T>* current;
+public:
+	Iterator(List<T>* new_container, List<T>::Node<T>* new_current)
+	{
+		container = new_container;
+		current = new_current;
+	}
+	Iterator<T>& operator++()
+	{
+		current = current->next;
+		return *this;
+	}
+	Iterator<T>& operator--()
+	{
+		current = current->prev;
+		return *this;
+	}
+	Iterator<T> operator++(int)
+	{
+		auto tmp = *this;
+		++(*this);
+		return tmp;
+	}
+	Iterator<T> operator--(int)
+	{
+		auto tmp = *this;
+		--(*this);
+		return tmp;
+	}
+	bool operator==(const Iterator<T>& rhs) const
+	{
+		return (current == rhs.current);
+	}
+	bool operator!= (const Iterator<T>& rhs) const
+	{
+		return !(current == rhs.current);
+	}
+	T& operator*()
+	{
+		return current->data;
+	}
+	T operator*() const
+	{
+		return current->data;
+	}
+};
+
+auto FillVector()
+{
+	std::vector<int> vec;
+	for (size_t i = 0; i < 10; i++)
+	{
+		vec.push_back(rand() % 11);
+	}
+	return vec;
+}
+auto FillVector(int)
+{
+	std::vector<int> vec;
+	for (size_t i = 0; i < 10; i++)
+	{
+		vec.push_back(rand() % 21 - 10);
+	}
+	return vec;
+}
+
+
+auto FilterVectorEvenNumbers(std::vector<int> vec)
+{
+	std::vector<int> result;
+	for (auto it = vec.begin(); it != vec.end(); ++it)
+	{
+		if (*it % 2 == 0)
 		{
-			for (int figure_number = 0; figure_number < 8; figure_number++)
-			{
-				if ((Mass[figure_number][0] == i || Mass[figure_number][1] == j))
-				{
-					ChessBoard[i][j] = false;
-				}
-			}
-			if (ChessBoard[i][j])
-			{
-				Mass[count][0] = i;
-				Mass[count][1] = j;
-				count -= 1;
-			}
+			result.push_back(*it);
 		}
 	}
-	ChessBoard[first_x][first_y] = true;
+	return result;
 }
 
-int check(int row, int col)
+auto FilterList(std::vector<int> vec)
 {
-	for (int cols_check = 0; cols_check < col; cols_check++)
+	std::list<int> result;
+	for (auto it = vec.begin(); it != vec.end(); ++it)
 	{
-		if (ChessBoard[row][cols_check]) return 0;
-
-		//Рассмотрим пример ситуации
-		// c_c = 1
-		// r = 4
-		// c = 3
-		// (2,2) = (r - c + c_c  , c_c)
-		// (6,2) = (r + c - c_c, c_c)
-		// r - c + c_c = 2
-		// (r + c - c_c, c_c)
-		// 
-		//	0      0      0      0      0      0      0      0
-		//	0	   0      0      0      0      0      0      0
-		//	0     (2,2)   0      0      0      0      0      0
-		//	0      0      0      0      0      0      0      0
-		//	0      0      0     (r,c)   0      0      0      0
-		//	0      0      0      0      0      0      0      0
-		//	0     (6,2)   0      0      0      0      0      0
-		//	0      0      0      0      0      0      0      0
-
-		//восходящая диагональ от нижнего левого угла
-		if (row + col - cols_check < 8) if (ChessBoard[row + col - cols_check][cols_check]) return 0;
-		//нисходящая диагональ от верхнего левого угла
-		if (row - col + cols_check >= 0) if (ChessBoard[row - col + cols_check][cols_check]) return 0;
-	}
-	return 1;
-}
-
-
-int FillWithQueens(int count = 0, int all_figures_to_be_filled = 8)
-{
-	if (count == all_figures_to_be_filled) return 1;
-	for (int i = 0; i < 8; i++)
-	{
-		if (check(i, count))
+		if (*it >= 0)
 		{
-			ChessBoard[i][count] = 1;
-			if (FillWithQueens(count + 1)) return 1;
-			ChessBoard[i][count] = 0;
+			result.push_back(*it);
+		}
+		else 
+		{
+			result.push_front(*it);
 		}
 	}
-	return 0;
+	return result;
 }
 
+
+template<typename T>
+void PrintVector(std::vector<T> vec)
+{
+	if (vec.size() == 0)
+	{
+		std::cout << "[]" << std::endl;
+		return;
+	}
+	std::cout << "[";
+	auto end_ = vec.end();
+	auto end_minus_one = std::prev(end_);
+	for (auto it = vec.begin(); it!= end_minus_one;++it)
+	{
+		std::cout << *it << " , ";
+	}
+	auto prev = std::prev(vec.end());
+	std::cout << *prev;
+	std::cout << "]" << std::endl;
+}
+
+template<typename T>
+void PrintVectorReverse(std::vector<T> vec)
+{
+	if (vec.size() == 0)
+	{
+		std::cout << "[]" << std::endl;
+		return;
+	}
+	std::cout << "[";
+	auto end_ = vec.rend();
+	auto end_minus_one = std::prev(end_);
+	for (auto it = vec.rbegin(); it != end_minus_one; ++it)
+	{
+		std::cout << *it << " , ";
+	}
+	std::cout << *vec.begin();
+	std::cout << "]" << std::endl;
+}
 
 
 int main()
 {
-	//FillChessBoard();
-	//FillMass();
-	//PrintChessBoard();
-	//PrintFigures();
-
-	//FillBoardWithRooks(3, 5, 1);
-	//PrintFigures();
-	//PrintChessBoard();
-	for (int i = 0; i < 8; i++)
+	//------ FIRST TASK -----------
+	std::cout << "FIRST TASK" <<  std::endl;
+	List<int> list;
+	list.PushFront(1);
+	list.PushFront(2);
+	list.PushFront(3);
+	list.PushFront(4);
+	list.PushFront(5);
+	for (auto it = list.Begin(); it != list.End(); it++)
 	{
-		for (int j = 0; j < 8; j++)
-		{
-			ChessBoard[i][j] = 0;
-		}
+		std::cout << *it << " ";
 	}
-	FillWithQueens();
-	PrintChessBoard();
+	std::cout << std::endl;
+	List<int> copy(list);
+	for (auto it = copy.Begin(); it != copy.End(); it++)
+	{
+		std::cout << *it << " ";
+	}
+	std::cout << std::endl << std::endl;
+
+	//------ SECOND AND THIRD TASK -----------
+	std::cout << "SECOND AND THIRD TASK" << std::endl;
+	std::vector<int> vector = FillVector();
+	PrintVector(vector);
+	PrintVectorReverse(vector);
+	
+	std::vector<int> even_vector = FilterVectorEvenNumbers(vector);
+	PrintVector(even_vector);
+	PrintVectorReverse(even_vector);
+	std::cout << std::endl << std::endl;
+	//------ FOURTH TASK -----------
+	std::cout << "FOURTH TASK" << std::endl;
+	std::vector<int> fourth_vector = FillVector(3);
+	PrintVector(fourth_vector);
+	PrintVectorReverse(fourth_vector);
+
+	std::list<int> some_list = FilterList(fourth_vector);
+	for (auto it = some_list.begin(); it != some_list.end(); ++it)
+	{
+		std::cout << *it << " ";
+	}
 }
